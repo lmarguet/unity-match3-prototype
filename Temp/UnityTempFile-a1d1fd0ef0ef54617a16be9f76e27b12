@@ -178,7 +178,7 @@
 -define:ENABLE_NATIVE_ARRAY_CHECKS
 -define:UNITY_TEAM_LICENSE
 'Assets/Scripts/BoardBehaviour.cs'
-'Assets/Scripts/Bootstrap.cs'
+'Assets/Scripts/BoardIndex.cs'
 'Assets/Scripts/Extensions/UnityExtensionMethods.cs'
 'Assets/Scripts/GameGemBehaviour.cs'
 'Assets/Scripts/TileBehaviour.cs'

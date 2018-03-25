@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,42 +19,36 @@ public class GameGemBehaviour : MonoBehaviour
         Cyan,
         Wild
     }
-    
-    public int xIndex;
-    public int yIndex;
+
+    public BoardIndex Index { get; private set; }
     public MatchValue MatchType;
-    
+
     private bool isMoving;
     private BoardBehaviour board;
-
-    void Start() { }
-
     
-
 
     public void SetCord(int x, int y)
     {
-        xIndex = x;
-        yIndex = y;
+        Index = new BoardIndex(x, y);
     }
 
     public GameGemBehaviour Init(BoardBehaviour board)
     {
         this.board = board;
+        
         return this;
     }
 
-    public void Move(int destX, int destY, float timeToMove)
+    public void Move(BoardIndex newIndex, float timeToMove)
     {
         if (isMoving) return;
         isMoving = true;
 
         StartCoroutine(
-            MoveRoutine(new Vector3(destX, destY), timeToMove)
+            MoveRoutine(new Vector3(newIndex.BoardX, newIndex.BoardY), timeToMove)
         );
     }
 
-    // TODO replace with tween
     IEnumerator MoveRoutine(Vector3 destination, float timeToMove)
     {
         var startPosition = transform.position;

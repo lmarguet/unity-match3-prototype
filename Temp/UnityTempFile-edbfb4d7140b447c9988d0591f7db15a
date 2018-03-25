@@ -178,9 +178,9 @@
 -define:ENABLE_NATIVE_ARRAY_CHECKS
 -define:UNITY_TEAM_LICENSE
 'Assets/Scripts/BoardBehaviour.cs'
-'Assets/Scripts/Bootstrap.cs'
+'Assets/Scripts/BoardIndex.cs'
 'Assets/Scripts/Extensions/UnityExtensionMethods.cs'
-'Assets/Scripts/GamePieceBehaviour.cs'
+'Assets/Scripts/GameGemBehaviour.cs'
 'Assets/Scripts/TileBehaviour.cs'
 -r:'/Applications/Unity/Hub/Editor/2017.3.1f1/Unity.app/Contents/Mono/lib/mono/unity/System.Runtime.Serialization.dll'
 -r:'/Applications/Unity/Hub/Editor/2017.3.1f1/Unity.app/Contents/Mono/lib/mono/unity/System.Xml.Linq.dll'

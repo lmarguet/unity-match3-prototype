@@ -1,21 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using DefaultNamespace;
 using UnityEngine;
 
 public class TileBehaviour : MonoBehaviour
 {
 
-	public int xIndex;
-	public int yIndex;
+	public BoardIndex Index { get; private set; }
 
 	private BoardBehaviour board;
-	
-	// Use this for initialization
-	void Start () {
-		
-	}
 
-	
+
 	#region User input
 
 	void OnMouseDown()
@@ -37,9 +30,9 @@ public class TileBehaviour : MonoBehaviour
 	
 	public TileBehaviour Init(int x, int y, BoardBehaviour board)
 	{
-		xIndex = x;
-		yIndex = y;
+		Index = new BoardIndex(x, y); 
 		this.board = board;
+		
 		return this;
 	}
 }

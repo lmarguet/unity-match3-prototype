@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Assets.Scripts.Extensions
 {
@@ -37,6 +38,23 @@ namespace Assets.Scripts.Extensions
             return gameObject;
         }
         
+        #endregion
+        
+        
+        #region Sprite Render Extensions
+
+        public static SpriteRenderer SetEnabled(this SpriteRenderer renderer, bool enabled)
+        {
+            renderer.enabled = enabled;
+            return renderer;
+        }
+        
+        public static SpriteRenderer SetColor(this SpriteRenderer renderer, Color color)
+        {
+            renderer.color = color;
+            return renderer;
+        }
+
         #endregion
     }
 }

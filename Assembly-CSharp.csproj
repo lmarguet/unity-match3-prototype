@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BoardBehaviour.cs" />
-    <Compile Include="Assets\Scripts\Bootstrap.cs" />
+    <Compile Include="Assets\Scripts\BoardIndex.cs" />
     <Compile Include="Assets\Scripts\Extensions\UnityExtensionMethods.cs" />
     <Compile Include="Assets\Scripts\GameGemBehaviour.cs" />
     <Compile Include="Assets\Scripts\TileBehaviour.cs" />
