@@ -236,9 +236,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea27270ef8ff4335b0c25bc4f4c3187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Width: 7
-  Height: 12
-  BorderSize: 1
+  Columns: 5
+  Rows: 8
+  Padding: 2
   MaxGemTypes: 5
   TilePrefab: {fileID: 1879358007490066, guid: 6d31ca93ad206447a917ae48dee1f1de, type: 2}
   GemPrefabs:

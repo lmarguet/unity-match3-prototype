@@ -9,9 +9,9 @@ using Random = UnityEngine.Random;
 
 public class BoardBehaviour : MonoBehaviour
 {
-    public int Width;
-    public int Height;
-    public int BorderSize;
+    public int Columns;
+    public int Rows;
+    public int Padding;
     public int MaxGemTypes;
     public GameObject TilePrefab;
     public GameObject[] GemPrefabs;
@@ -24,18 +24,18 @@ public class BoardBehaviour : MonoBehaviour
     
     
 
-    private TileBehaviour[,] tiles;
-    private GameGemBehaviour[,] allGameGems;
+    private GridTileBehaviour[,] tiles;
+    private GemBehaviour[,] allGems;
 
-    private TileBehaviour clickedTile;
-    private TileBehaviour targetTile;
+    private GridTileBehaviour clickedTile;
+    private GridTileBehaviour targetTile;
 
 
     // Use this for initialization
     void Start()
     {
-        tiles = new TileBehaviour[Width, Height];
-        allGameGems = new GameGemBehaviour[Width, Height];
+        tiles = new GridTileBehaviour[Columns, Rows];
+        allGems = new GemBehaviour[Columns, Rows];
 
         SetupCamera();
         SetupTiles();
@@ -47,13 +47,13 @@ public class BoardBehaviour : MonoBehaviour
 
     private void SetupTiles()
     {
-        for (var i = 0; i < Width; i++){
-            for (var j = 0; j < Height; j++){
+        for (var i = 0; i < Columns; i++){
+            for (var j = 0; j < Rows; j++){
                 tiles[i, j] =
                     Instantiate(TilePrefab,
                                 new Vector3(i, j), Quaternion.identity, parent: TileContainer)
                        .SetName(string.Format("Tile [{0}:{1}]", i, j))
-                       .GetComponent<TileBehaviour>()
+                       .GetComponent<GridTileBehaviour>()
                        .Init(i, j, this);
             }
         }
@@ -65,24 +65,24 @@ public class BoardBehaviour : MonoBehaviour
         var camera = Camera.main;
 
         camera.gameObject.SetPosition(
-            (float) (Width - 1) / 2,
-            (float) (Height - 1) / 2,
+            (float) (Columns - 1) / 2,
+            (float) (Rows - 1) / 2,
             -10f);
 
         var aspectRatio = (float) Screen.width / Screen.height;
-        var verticalSize = (float) Height / 2 + BorderSize;
-        var horizontalSize = (float) Width / 2 + BorderSize / aspectRatio;
+        var verticalSize = (float) Rows / 2 + Padding;
+        var horizontalSize = (float) Columns / 2 + Padding / aspectRatio;
 
         camera.orthographicSize = Mathf.Max(verticalSize, horizontalSize);
     }
 
     private void FillBoard()
     {
-        for (var i = 0; i < Width; i++){
-            for (var j = 0; j < Height; j++){
+        for (var i = 0; i < Columns; i++){
+            for (var j = 0; j < Rows; j++){
                 var attempts = 0;
 
-                var index = new BoardIndex(i, j);
+                var index = new GridIndex(i, j);
                 do{
                     if (attempts > 0){
                         ClearGemAt(index);
@@ -99,20 +99,20 @@ public class BoardBehaviour : MonoBehaviour
         }
     }
 
-    private GameGemBehaviour FillRandomGemAt(BoardIndex index)
+    private GemBehaviour FillRandomGemAt(GridIndex index)
     {
         return PlaceGem(
             gem: Instantiate(
                      GetRandomGemPrefab(),
                      Vector3.zero, Quaternion.identity, parent: GemContainer)
-                .GetComponent<GameGemBehaviour>()
+                .GetComponent<GemBehaviour>()
                 .Init(this),
-            x: index.BoardX,
-            y: index.BoardY
+            x: index.GridX,
+            y: index.GridY
         );
     }
 
-    private bool HasMatchOnFill(BoardIndex index)
+    private bool HasMatchOnFill(GridIndex index)
     {
         return FindMatches(index, Vector2.left).Count() >= 3
             || FindMatches(index, Vector2.down).Count() >= 3;
@@ -130,7 +130,7 @@ public class BoardBehaviour : MonoBehaviour
         ];
     }
 
-    public GameGemBehaviour PlaceGem(GameGemBehaviour gem, int x, int y)
+    public GemBehaviour PlaceGem(GemBehaviour gem, int x, int y)
     {
         gem.gameObject
            .ResetTransformation()
@@ -141,28 +141,28 @@ public class BoardBehaviour : MonoBehaviour
         return gem;
     }
 
-    private void SetGemPosition(GameGemBehaviour gem, int x, int y)
+    private void SetGemPosition(GemBehaviour gem, int x, int y)
     {
-        allGameGems[x, y] = gem;
+        allGems[x, y] = gem;
         gem.SetCord(x, y);
     }
 
-    private bool IsInBounds(BoardIndex index)
+    private bool IsInBounds(GridIndex index)
     {
-        return index.BoardX >= 0 && index.BoardX < Width
-                                 && index.BoardY >= 0 && index.BoardY < Height;
+        return index.GridX >= 0 && index.GridX < Columns
+                                 && index.GridY >= 0 && index.GridY < Rows;
     }
 
-    private void ClearGemAt(BoardIndex index)
+    private void ClearGemAt(GridIndex index)
     {
         var gem = GetGem(index);
         if (gem != null){
-            allGameGems[index.BoardX, index.BoardY] = null;
+            allGems[index.GridX, index.GridY] = null;
             Destroy(gem.gameObject);
         }
     }
 
-    private void ClearGems(IEnumerable<GameGemBehaviour> matches)
+    private void ClearGems(IEnumerable<GemBehaviour> matches)
     {
         foreach (var gem in matches){
             ClearGemAt(gem.Index);
@@ -171,18 +171,18 @@ public class BoardBehaviour : MonoBehaviour
 
     private void ClearBoard()
     {
-        for (var i = 0; i < Width; i++){
-            for (var j = 0; j < Height; j++){
+        for (var i = 0; i < Columns; i++){
+            for (var j = 0; j < Rows; j++){
                 ClearGemAt(
-                    new BoardIndex(i, j)
+                    new GridIndex(i, j)
                 );
             }
         }
     }
 
-    private List<GameGemBehaviour> CollapseColumns(IEnumerable<GameGemBehaviour> gems)
+    private List<GemBehaviour> CollapseColumns(IEnumerable<GemBehaviour> gems)
     {
-        var movingGems = new List<GameGemBehaviour>();
+        var movingGems = new List<GemBehaviour>();
         
         var columns = GetColumns(gems);
         foreach (var column in columns){
@@ -195,27 +195,27 @@ public class BoardBehaviour : MonoBehaviour
     }
     
     // TODO refactor!
-    private List<GameGemBehaviour> CollapseColumn(int column)
+    private List<GemBehaviour> CollapseColumn(int column)
     {
-        var movingGems =  new List<GameGemBehaviour>();
+        var movingGems =  new List<GemBehaviour>();
 
-        for (var i = 0; i < Height - 1; i++){
+        for (var i = 0; i < Rows - 1; i++){
             if (GetGem(column, i) != null){
                 continue;
             }
 
-            for (var j = i + 1; j < Height; j++){
+            for (var j = i + 1; j < Rows; j++){
                 var gem = GetGem(column, j);
                 if (gem == null || movingGems.Contains(gem)){
                     continue;
                 }
 
-                gem.Move(new BoardIndex(column, i), GEM_MOVE_TIME);
+                gem.Move(new GridIndex(column, i), GEM_MOVE_TIME);
                 
                 SetGemPosition(gem, column, i);
                 movingGems.Add(gem);
                 
-                allGameGems[column, j] = null;
+                allGems[column, j] = null;
                 break;
             }
         }
@@ -228,14 +228,14 @@ public class BoardBehaviour : MonoBehaviour
 
     #region Gameplay
 
-    public void ClickTile(TileBehaviour tile)
+    public void ClickTile(GridTileBehaviour tile)
     {
         if (clickedTile == null){
             clickedTile = tile;
         }
     }
 
-    public void DragToTile(TileBehaviour tile)
+    public void DragToTile(GridTileBehaviour tile)
     {
         if (clickedTile != null){
             targetTile = tile;
@@ -252,7 +252,7 @@ public class BoardBehaviour : MonoBehaviour
         targetTile = null;
     }
 
-    private void SwapTiles(TileBehaviour clicked, TileBehaviour target)
+    private void SwapTiles(GridTileBehaviour clicked, GridTileBehaviour target)
     {
         if (!IsDirecNeighbor(clicked.Index, target.Index)){
             return;
@@ -265,7 +265,7 @@ public class BoardBehaviour : MonoBehaviour
         );
     }
 
-    private IEnumerator SwapTilesRoutine(GameGemBehaviour gemA, GameGemBehaviour gemB)
+    private IEnumerator SwapTilesRoutine(GemBehaviour gemA, GemBehaviour gemB)
     {
         var indexA = gemA.Index.Clone();
         var indexB = gemB.Index.Clone();
@@ -289,10 +289,10 @@ public class BoardBehaviour : MonoBehaviour
     }
 
 
-    private static bool IsDirecNeighbor(BoardIndex indexA, BoardIndex indexB)
+    private static bool IsDirecNeighbor(GridIndex indexA, GridIndex indexB)
     {
-        return Mathf.Abs(indexA.BoardX - indexB.BoardX) == 1 && indexA.BoardY == indexB.BoardY
-            || Mathf.Abs(indexA.BoardY - indexB.BoardY) == 1 && indexA.BoardX == indexB.BoardX;
+        return Mathf.Abs(indexA.GridX - indexB.GridX) == 1 && indexA.GridY == indexB.GridY
+            || Mathf.Abs(indexA.GridY - indexB.GridY) == 1 && indexA.GridX == indexB.GridX;
     }
 
     #endregion
@@ -300,9 +300,9 @@ public class BoardBehaviour : MonoBehaviour
 
     #region Matching
 
-    private IEnumerable<GameGemBehaviour> FindMatches(BoardIndex startIndex, Vector2 searchDirection)
+    private IEnumerable<GemBehaviour> FindMatches(GridIndex startIndex, Vector2 searchDirection)
     {
-        var matches = new List<GameGemBehaviour>();
+        var matches = new List<GemBehaviour>();
 
         var startGem = GetGem(startIndex);
         if (startGem == null){
@@ -311,12 +311,12 @@ public class BoardBehaviour : MonoBehaviour
 
         matches.Add(startGem);
 
-        var maxValue = Mathf.Max(Width, Height);
+        var maxValue = Mathf.Max(Columns, Rows);
 
         for (var i = 1; i < maxValue - 1; i++){
-            var index = new BoardIndex(
-                startIndex.BoardX + (int) searchDirection.x * i,
-                startIndex.BoardY + (int) searchDirection.y * i
+            var index = new GridIndex(
+                startIndex.GridX + (int) searchDirection.x * i,
+                startIndex.GridY + (int) searchDirection.y * i
             );
 
             if (!IsInBounds(index)){
@@ -336,17 +336,17 @@ public class BoardBehaviour : MonoBehaviour
     }
 
 
-    private List<GameGemBehaviour> FindVerticalMatches(BoardIndex index)
+    private List<GemBehaviour> FindVerticalMatches(GridIndex index)
     {
         return FindAndCombineMatches(index, direction1: Vector2.down, direction2: Vector2.up);
     }
 
-    private List<GameGemBehaviour> FindHorizontalMatches(BoardIndex index)
+    private List<GemBehaviour> FindHorizontalMatches(GridIndex index)
     {
         return FindAndCombineMatches(index, direction1: Vector2.left, direction2: Vector2.right);
     }
 
-    private List<GameGemBehaviour> FindAndCombineMatches(BoardIndex index, Vector2 direction1, Vector2 direction2)
+    private List<GemBehaviour> FindAndCombineMatches(GridIndex index, Vector2 direction1, Vector2 direction2)
     {
         return
             FindMatches(index, searchDirection: direction1)
@@ -355,17 +355,17 @@ public class BoardBehaviour : MonoBehaviour
                .ToList();
     }
 
-    private IEnumerable<GameGemBehaviour> FindMatchesAt(BoardIndex index)
+    private IEnumerable<GemBehaviour> FindMatchesAt(GridIndex index)
     {
         var hMatches = FindHorizontalMatches(index);
         var vMatches = FindVerticalMatches(index);
 
-        hMatches = hMatches.Count >= 3 ? hMatches : new List<GameGemBehaviour>();
-        vMatches = vMatches.Count >= 3 ? vMatches : new List<GameGemBehaviour>();
+        hMatches = hMatches.Count >= 3 ? hMatches : new List<GemBehaviour>();
+        vMatches = vMatches.Count >= 3 ? vMatches : new List<GemBehaviour>();
 
         return hMatches.Count + vMatches.Count > 0
                    ? hMatches.Union(vMatches).ToList()
-                   : new List<GameGemBehaviour>();
+                   : new List<GemBehaviour>();
     }
 
     #endregion
@@ -375,17 +375,17 @@ public class BoardBehaviour : MonoBehaviour
 
     private void HighlightMatches()
     {
-        for (var i = 0; i < Width; i++){
-            for (var j = 0; j < Height; j++){
+        for (var i = 0; i < Columns; i++){
+            for (var j = 0; j < Rows; j++){
                 HighlightMatchesAt(
-                    new BoardIndex(i, j)
+                    new GridIndex(i, j)
                 );
             }
         }
     }
 
 
-    private void HighlightMatchesAt(BoardIndex index)
+    private void HighlightMatchesAt(GridIndex index)
     {
         var matches = FindMatchesAt(index);
 
@@ -394,7 +394,7 @@ public class BoardBehaviour : MonoBehaviour
         }
     }
 
-    private void HighlightTile(BoardIndex index)
+    private void HighlightTile(GridIndex index)
     {
         GetTile(index)
            .GetComponent<SpriteRenderer>()
@@ -410,30 +410,30 @@ public class BoardBehaviour : MonoBehaviour
 
     #region Indexing
 
-    private TileBehaviour GetTile(BoardIndex index)
+    private GridTileBehaviour GetTile(GridIndex index)
     {
         return IsInBounds(index)
-                   ? tiles[index.BoardX, index.BoardY]
+                   ? tiles[index.GridX, index.GridY]
                    : null;
     }
 
-    private GameGemBehaviour GetGem(int xIndex, int yIndex)
+    private GemBehaviour GetGem(int xIndex, int yIndex)
     {
-        return GetGem(new BoardIndex(xIndex, yIndex));
+        return GetGem(new GridIndex(xIndex, yIndex));
     }
 
-    private GameGemBehaviour GetGem(BoardIndex index)
+    private GemBehaviour GetGem(GridIndex index)
     {
         return IsInBounds(index)
-                   ? allGameGems[index.BoardX, index.BoardY]
+                   ? allGems[index.GridX, index.GridY]
                    : null;
     }
 
-    private HashSet<int> GetColumns(IEnumerable<GameGemBehaviour> gems)
+    private HashSet<int> GetColumns(IEnumerable<GemBehaviour> gems)
     {
         var columns = new HashSet<int>();
         foreach (var gem in gems){
-            columns.Add(gem.Index.BoardX);
+            columns.Add(gem.Index.GridX);
         }
         
         return columns;

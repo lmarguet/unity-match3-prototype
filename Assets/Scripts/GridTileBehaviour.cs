@@ -1,10 +1,10 @@
 ﻿using DefaultNamespace;
 using UnityEngine;
 
-public class TileBehaviour : MonoBehaviour
+public class GridTileBehaviour : MonoBehaviour
 {
 
-	public BoardIndex Index { get; private set; }
+	public GridIndex Index { get; private set; }
 
 	private BoardBehaviour board;
 
@@ -28,9 +28,9 @@ public class TileBehaviour : MonoBehaviour
 
 	#endregion
 	
-	public TileBehaviour Init(int x, int y, BoardBehaviour board)
+	public GridTileBehaviour Init(int x, int y, BoardBehaviour board)
 	{
-		Index = new BoardIndex(x, y); 
+		Index = new GridIndex(x, y); 
 		this.board = board;
 		
 		return this;

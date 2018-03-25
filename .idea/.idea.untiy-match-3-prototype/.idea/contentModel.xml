@@ -15,12 +15,12 @@
         </e>
         <e p="Scripts" t="Include">
           <e p="BoardBehaviour.cs" t="Include" />
-          <e p="BoardIndex.cs" t="Include" />
           <e p="Extensions" t="Include">
             <e p="UnityExtensionMethods.cs" t="Include" />
           </e>
-          <e p="GameGemBehaviour.cs" t="Include" />
-          <e p="TileBehaviour.cs" t="Include" />
+          <e p="GemBehaviour.cs" t="Include" />
+          <e p="GridIndex.cs" t="Include" />
+          <e p="GridTileBehaviour.cs" t="Include" />
         </e>
       </e>
       <e p="Library" t="ExcludeRecursive" />

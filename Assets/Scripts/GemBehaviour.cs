@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using DefaultNamespace;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class GameGemBehaviour : MonoBehaviour
+public class GemBehaviour : MonoBehaviour
 {
     public enum MatchValue
     {
@@ -20,7 +17,7 @@ public class GameGemBehaviour : MonoBehaviour
         Wild
     }
 
-    public BoardIndex Index { get; private set; }
+    public GridIndex Index { get; private set; }
     public MatchValue MatchType;
 
     private bool isMoving;
@@ -29,23 +26,23 @@ public class GameGemBehaviour : MonoBehaviour
 
     public void SetCord(int x, int y)
     {
-        Index = new BoardIndex(x, y);
+        Index = new GridIndex(x, y);
     }
 
-    public GameGemBehaviour Init(BoardBehaviour board)
+    public GemBehaviour Init(BoardBehaviour board)
     {
         this.board = board;
         
         return this;
     }
 
-    public void Move(BoardIndex newIndex, float timeToMove)
+    public void Move(GridIndex newIndex, float timeToMove)
     {
         if (isMoving) return;
         isMoving = true;
 
         StartCoroutine(
-            MoveRoutine(new Vector3(newIndex.BoardX, newIndex.BoardY), timeToMove)
+            MoveRoutine(new Vector3(newIndex.GridX, newIndex.GridY), timeToMove)
         );
     }
 
