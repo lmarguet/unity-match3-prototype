@@ -5,8 +5,8 @@ using UnityEngine;
 public class TileBehaviour : MonoBehaviour
 {
 
-	public int indeX;
-	public int indeY;
+	public int xIndex;
+	public int yIndex;
 
 	private BoardBehaviour board;
 	
@@ -15,10 +15,30 @@ public class TileBehaviour : MonoBehaviour
 		
 	}
 
+	
+	#region User input
+
+	void OnMouseDown()
+	{
+		board.ClickTile(this);
+	}
+
+	void OnMouseEnter()
+	{
+		board.DragToTile(this);	
+	}
+
+	void OnMouseUp()
+	{
+		board.ReleaseTile();
+	}
+
+	#endregion
+	
 	public TileBehaviour Init(int x, int y, BoardBehaviour board)
 	{
-		indeX = x;
-		indeY = y;
+		xIndex = x;
+		yIndex = y;
 		this.board = board;
 		return this;
 	}

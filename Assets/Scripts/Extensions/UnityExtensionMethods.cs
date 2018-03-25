@@ -31,6 +31,12 @@ namespace Assets.Scripts.Extensions
             return gameObject;
         }
 
+        public static GameObject ResetTransformation(this GameObject gameObject)
+        {
+            gameObject.transform.ResetTransformation();
+            return gameObject;
+        }
+        
         #endregion
     }
 }

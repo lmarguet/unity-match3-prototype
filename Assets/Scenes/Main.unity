@@ -219,7 +219,9 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1942961667}
+  - {fileID: 1557949141}
   m_Father: {fileID: 1153948313}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -234,10 +236,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea27270ef8ff4335b0c25bc4f4c3187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Width: 10
-  Height: 15
-  BorderSize: 2
+  Width: 7
+  Height: 12
+  BorderSize: 1
   TilePrefab: {fileID: 1879358007490066, guid: 6d31ca93ad206447a917ae48dee1f1de, type: 2}
+  GemPrefabs:
+  - {fileID: 1746864848946036, guid: 925a45a4b8a0a455ab2241c894e77e48, type: 2}
+  - {fileID: 1468575402563044, guid: 69017300ec3a24bf090994cee9e9daea, type: 2}
+  - {fileID: 1315850786271934, guid: 40a4c6df7f0ab4fe48ba3e1860ab558a, type: 2}
+  - {fileID: 1760442834820114, guid: 32b636a5654364c7f82d62aa7856fcb9, type: 2}
+  - {fileID: 1628677708611726, guid: 574c48dad27904c1b86b0436cad2b001, type: 2}
+  - {fileID: 1001480133792112, guid: 825f04cfba83f4a67a3ad4995d461185, type: 2}
+  - {fileID: 1844191197609882, guid: c92743c63c10142c1a5f8a00c33728ff, type: 2}
+  TileContainer: {fileID: 1942961667}
+  GemContainer: {fileID: 1557949141}
 --- !u!1 &1001007892
 GameObject:
   m_ObjectHideFlags: 0
@@ -285,7 +297,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.16428389, g: 0.1532764, b: 0.19852942, a: 1}
+  m_Color: {r: 0.24876088, g: 0.24599914, b: 0.25735295, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -346,6 +358,34 @@ Transform:
   - {fileID: 949463140}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1557949140
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1557949141}
+  m_Layer: 0
+  m_Name: Gems
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1557949141
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1557949140}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 949463140}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1570469314
 GameObject:
@@ -502,4 +542,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1942961666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1942961667}
+  m_Layer: 0
+  m_Name: Tiles
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1942961667
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1942961666}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 949463140}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
