@@ -236,25 +236,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea27270ef8ff4335b0c25bc4f4c3187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Columns: 5
-  Rows: 8
-  Padding: 2
-  MaxGemTypes: 3
-  TilePrefab: {fileID: 1879358007490066, guid: 6d31ca93ad206447a917ae48dee1f1de, type: 2}
-  GemPrefabs:
-  - {fileID: 1746864848946036, guid: 925a45a4b8a0a455ab2241c894e77e48, type: 2}
-  - {fileID: 1468575402563044, guid: 69017300ec3a24bf090994cee9e9daea, type: 2}
-  - {fileID: 1315850786271934, guid: 40a4c6df7f0ab4fe48ba3e1860ab558a, type: 2}
-  - {fileID: 1760442834820114, guid: 32b636a5654364c7f82d62aa7856fcb9, type: 2}
-  - {fileID: 1628677708611726, guid: 574c48dad27904c1b86b0436cad2b001, type: 2}
-  - {fileID: 1001480133792112, guid: 825f04cfba83f4a67a3ad4995d461185, type: 2}
-  - {fileID: 1844191197609882, guid: c92743c63c10142c1a5f8a00c33728ff, type: 2}
-  TileContainer: {fileID: 1942961667}
-  GemContainer: {fileID: 1557949141}
-  GemMoveTime: 0.2
-  GemFallTime: 0.05
-  PlayerMatchCheckDelay: 0.2
-  RefreshMatchCheckDelay: 0.5
+  GridParameters:
+    Columns: 5
+    Rows: 10
+    Padding: 2
+    MaxGemTypes: 3
+  ViewParameters:
+    TilePrefab: {fileID: 1879358007490066, guid: 6d31ca93ad206447a917ae48dee1f1de,
+      type: 2}
+    GemPrefabs:
+    - {fileID: 1746864848946036, guid: 925a45a4b8a0a455ab2241c894e77e48, type: 2}
+    - {fileID: 1468575402563044, guid: 69017300ec3a24bf090994cee9e9daea, type: 2}
+    - {fileID: 1315850786271934, guid: 40a4c6df7f0ab4fe48ba3e1860ab558a, type: 2}
+    - {fileID: 1760442834820114, guid: 32b636a5654364c7f82d62aa7856fcb9, type: 2}
+    - {fileID: 1628677708611726, guid: 574c48dad27904c1b86b0436cad2b001, type: 2}
+    - {fileID: 1001480133792112, guid: 825f04cfba83f4a67a3ad4995d461185, type: 2}
+    - {fileID: 1844191197609882, guid: c92743c63c10142c1a5f8a00c33728ff, type: 2}
+    TileContainer: {fileID: 1942961667}
+    GemContainer: {fileID: 1557949141}
+  SequenceParameters:
+    GemMoveTime: 0.1
+    GemFallTime: 0.2
+    PlayerMatchCheckDelay: 0.2
+    RefreshMatchCheckDelay: 0.5
 --- !u!1 &1001007892
 GameObject:
   m_ObjectHideFlags: 0

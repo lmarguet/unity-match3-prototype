@@ -53,10 +53,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BoardBehaviour.cs" />
+    <Compile Include="Assets\Scripts\BoardUtils.cs" />
     <Compile Include="Assets\Scripts\Extensions\UnityExtensionMethods.cs" />
     <Compile Include="Assets\Scripts\GemBehaviour.cs" />
+    <Compile Include="Assets\Scripts\GemMatchingHelper.cs" />
     <Compile Include="Assets\Scripts\GridIndex.cs" />
+    <Compile Include="Assets\Scripts\GridManager.cs" />
     <Compile Include="Assets\Scripts\GridTileBehaviour.cs" />
+    <Compile Include="Assets\Scripts\TilesManager.cs" />
     <Reference Include="UnityEngine.UI">
       <HintPath>/Applications/Unity/Hub/Editor/2017.3.1f1/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
     </Reference>

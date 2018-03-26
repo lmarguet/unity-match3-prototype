@@ -18,12 +18,21 @@ public class GemBehaviour : MonoBehaviour
         Wild
     }
 
-    public GridIndex Index    { get; private set; }
-    public bool      IsMoving { get; private set; }
+    public Action<GemBehaviour, GridIndex> OnMoveComplete;
+
+    public GridIndex Index { get; private set; }
+    public bool IsMoving { get; private set; }
 
     public MatchValue MatchType;
 
     private BoardBehaviour board;
+
+
+    public GemBehaviour Init(BoardBehaviour board)
+    {
+        this.board = board;
+        return this;
+    }
 
 
     public GemBehaviour SetCord(GridIndex index)
@@ -44,22 +53,19 @@ public class GemBehaviour : MonoBehaviour
     }
 
 
-    public GemBehaviour Init(BoardBehaviour board)
-    {
-        this.board = board;
-
-        return this;
-    }
-
     public void Move(GridIndex newIndex, float timeToMove)
     {
-        if (IsMoving) return;
+        if (IsMoving){
+            return;
+        }
+
         IsMoving = true;
 
         StartCoroutine(
             MoveRoutine(newIndex, timeToMove)
         );
     }
+
 
     private IEnumerator MoveRoutine(GridIndex newIndex, float timeToMove)
     {
@@ -83,7 +89,9 @@ public class GemBehaviour : MonoBehaviour
             yield return null;
         }
 
-        board.PlaceGem(this, newIndex);
+        if (OnMoveComplete != null){
+            OnMoveComplete(this, newIndex);
+        }
 
         IsMoving = false;
     }

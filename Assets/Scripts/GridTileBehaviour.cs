@@ -1,38 +1,49 @@
-﻿using DefaultNamespace;
+﻿using System;
+using DefaultNamespace;
 using UnityEngine;
 
 public class GridTileBehaviour : MonoBehaviour
 {
+    public Action<GridTileBehaviour> OnPress;
+    public Action<GridTileBehaviour> OnDragOver;
+    public Action<GridTileBehaviour> OnRelease;
 
-	public GridIndex Index { get; private set; }
+    public GridIndex Index { get; private set; }
 
-	private BoardBehaviour board;
+    private BoardBehaviour board;
 
 
-	#region User input
+    #region User input
 
-	void OnMouseDown()
-	{
-		board.ClickTile(this);
-	}
+    void OnMouseDown()
+    {
+        if (OnPress != null){
+            OnPress(this);
+        }
+    }
 
-	void OnMouseEnter()
-	{
-		board.DragToTile(this);	
-	}
+    void OnMouseEnter()
+    {
+        if (OnDragOver != null){
+            OnDragOver(this);
+        }
+    }
 
-	void OnMouseUp()
-	{
-		board.ReleaseTile();
-	}
+    void OnMouseUp()
+    {
+        if (OnRelease != null){
+            OnRelease(this);
+        }
+    }
 
-	#endregion
-	
-	public GridTileBehaviour Init(int x, int y, BoardBehaviour board)
-	{
-		Index = new GridIndex(x, y); 
-		this.board = board;
-		
-		return this;
-	}
+    #endregion
+
+
+    public GridTileBehaviour Init(int x, int y, BoardBehaviour board)
+    {
+        Index = new GridIndex(x, y);
+        this.board = board;
+
+        return this;
+    }
 }
