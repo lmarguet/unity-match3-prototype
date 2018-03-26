@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using DefaultNamespace;
 using UnityEngine;
 
@@ -17,40 +18,55 @@ public class GemBehaviour : MonoBehaviour
         Wild
     }
 
-    public GridIndex Index { get; private set; }
+    public GridIndex Index    { get; private set; }
+    public bool      IsMoving { get; private set; }
+
     public MatchValue MatchType;
 
-    private bool isMoving;
     private BoardBehaviour board;
-    
 
-    public void SetCord(int x, int y)
+
+    public GemBehaviour SetCord(GridIndex index)
     {
-        Index = new GridIndex(x, y);
+        Index = index;
+        return this;
     }
+
+
+    public GemBehaviour ApplyOffsetY(int yOffset, float timeToFall)
+    {
+        if (yOffset > 0){
+            transform.position = new Vector3(Index.GridX, yOffset);
+            Move(new GridIndex(Index.GridX, Index.GridY), timeToFall);
+        }
+
+        return this;
+    }
+
 
     public GemBehaviour Init(BoardBehaviour board)
     {
         this.board = board;
-        
+
         return this;
     }
 
     public void Move(GridIndex newIndex, float timeToMove)
     {
-        if (isMoving) return;
-        isMoving = true;
+        if (IsMoving) return;
+        IsMoving = true;
 
         StartCoroutine(
-            MoveRoutine(new Vector3(newIndex.GridX, newIndex.GridY), timeToMove)
+            MoveRoutine(newIndex, timeToMove)
         );
     }
 
-    IEnumerator MoveRoutine(Vector3 destination, float timeToMove)
+    private IEnumerator MoveRoutine(GridIndex newIndex, float timeToMove)
     {
         var startPosition = transform.position;
         var reachedDestination = false;
         var elapsedTime = 0f;
+        var destination = new Vector3(newIndex.GridX, newIndex.GridY);
 
         while (!reachedDestination){
             elapsedTime += Time.deltaTime;
@@ -67,8 +83,8 @@ public class GemBehaviour : MonoBehaviour
             yield return null;
         }
 
-        board.PlaceGem(this, (int) destination.x, (int) destination.y);
+        board.PlaceGem(this, newIndex);
 
-        isMoving = false;
+        IsMoving = false;
     }
 }

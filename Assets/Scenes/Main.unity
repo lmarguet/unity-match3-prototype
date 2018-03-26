@@ -239,7 +239,7 @@ MonoBehaviour:
   Columns: 5
   Rows: 8
   Padding: 2
-  MaxGemTypes: 5
+  MaxGemTypes: 3
   TilePrefab: {fileID: 1879358007490066, guid: 6d31ca93ad206447a917ae48dee1f1de, type: 2}
   GemPrefabs:
   - {fileID: 1746864848946036, guid: 925a45a4b8a0a455ab2241c894e77e48, type: 2}
@@ -251,6 +251,10 @@ MonoBehaviour:
   - {fileID: 1844191197609882, guid: c92743c63c10142c1a5f8a00c33728ff, type: 2}
   TileContainer: {fileID: 1942961667}
   GemContainer: {fileID: 1557949141}
+  GemMoveTime: 0.2
+  GemFallTime: 0.05
+  PlayerMatchCheckDelay: 0.2
+  RefreshMatchCheckDelay: 0.5
 --- !u!1 &1001007892
 GameObject:
   m_ObjectHideFlags: 0

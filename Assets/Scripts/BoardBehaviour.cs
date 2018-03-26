@@ -1,41 +1,50 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using Assets.Scripts.Extensions;
 using UnityEngine;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using DefaultNamespace;
 using Random = UnityEngine.Random;
 
 public class BoardBehaviour : MonoBehaviour
 {
+    // TODO move to serialized
     public int Columns;
     public int Rows;
     public int Padding;
     public int MaxGemTypes;
+
+    // TODO move to serialized
     public GameObject TilePrefab;
     public GameObject[] GemPrefabs;
     public Transform TileContainer;
     public Transform GemContainer;
 
-    private const float GEM_MOVE_TIME = 0.2f;
-    private const float MATCH_CHECK_DELAY = 0.1f;
+    // TODO move to serialized
+    public float GemMoveTime = 0.2f;
+    public float GemFallTime = 0.25f;
+    public float PlayerMatchCheckDelay = 0.1f;
+    public float RefreshMatchCheckDelay = 0.35f;
+
     private const int MAX_FILL_ATTEMPTS = 200;
-    
-    
+    private const int REFILL_Y_OFFSET = 5;
 
     private GridTileBehaviour[,] tiles;
     private GemBehaviour[,] allGems;
-
     private GridTileBehaviour clickedTile;
     private GridTileBehaviour targetTile;
-
+    private bool playerControlsEnabled = true;
 
     // Use this for initialization
     void Start()
     {
         tiles = new GridTileBehaviour[Columns, Rows];
         allGems = new GemBehaviour[Columns, Rows];
+        MaxGemTypes = Mathf.Clamp(MaxGemTypes, 3, GemPrefabs.Length);
+
 
         SetupCamera();
         SetupTiles();
@@ -76,13 +85,17 @@ public class BoardBehaviour : MonoBehaviour
         camera.orthographicSize = Mathf.Max(verticalSize, horizontalSize);
     }
 
-    private void FillBoard()
+    private void FillBoard(bool isRefill = false)
     {
         for (var i = 0; i < Columns; i++){
             for (var j = 0; j < Rows; j++){
-                var attempts = 0;
-
                 var index = new GridIndex(i, j);
+                if (GetGem(index) != null){
+                    continue;
+                }
+
+                var yOffest = isRefill ? index.GridY + REFILL_Y_OFFSET : 0;
+                var attempts = 0;
                 do{
                     if (attempts > 0){
                         ClearGemAt(index);
@@ -92,24 +105,24 @@ public class BoardBehaviour : MonoBehaviour
                         }
                     }
 
-                    FillRandomGemAt(index);
+                    FillRandomGemAt(index, yOffest);
                     attempts++;
                 } while (HasMatchOnFill(index));
             }
         }
     }
 
-    private GemBehaviour FillRandomGemAt(GridIndex index)
+    private GemBehaviour FillRandomGemAt(GridIndex index, int yOffset = 0)
     {
-        return PlaceGem(
-            gem: Instantiate(
-                     GetRandomGemPrefab(),
-                     Vector3.zero, Quaternion.identity, parent: GemContainer)
-                .GetComponent<GemBehaviour>()
-                .Init(this),
-            x: index.GridX,
-            y: index.GridY
-        );
+        return
+            PlaceGem(
+                gem: Instantiate(
+                         GetRandomGemPrefab(),
+                         Vector3.zero, Quaternion.identity, parent: GemContainer)
+                    .GetComponent<GemBehaviour>()
+                    .Init(this),
+                index: index
+            ).ApplyOffsetY(yOffset, GemFallTime);
     }
 
     private bool HasMatchOnFill(GridIndex index)
@@ -130,27 +143,26 @@ public class BoardBehaviour : MonoBehaviour
         ];
     }
 
-    public GemBehaviour PlaceGem(GemBehaviour gem, int x, int y)
+    public GemBehaviour PlaceGem(GemBehaviour gem, GridIndex index)
     {
         gem.gameObject
            .ResetTransformation()
-           .SetPosition(x, y);
+           .SetPosition(index.GridX, index.GridY);
 
-        SetGemPosition(gem, x, y);
-
+        SetGemPosition(gem, index);
         return gem;
     }
 
-    private void SetGemPosition(GemBehaviour gem, int x, int y)
+    private void SetGemPosition(GemBehaviour gem, GridIndex index)
     {
-        allGems[x, y] = gem;
-        gem.SetCord(x, y);
+        allGems[index.GridX, index.GridY] = gem;
+        gem.SetCord(index);
     }
 
     private bool IsInBounds(GridIndex index)
     {
         return index.GridX >= 0 && index.GridX < Columns
-                                 && index.GridY >= 0 && index.GridY < Rows;
+                                && index.GridY >= 0 && index.GridY < Rows;
     }
 
     private void ClearGemAt(GridIndex index)
@@ -180,10 +192,10 @@ public class BoardBehaviour : MonoBehaviour
         }
     }
 
-    private List<GemBehaviour> CollapseColumns(IEnumerable<GemBehaviour> gems)
+    private IEnumerable<GemBehaviour> CollapseColumns(IEnumerable<GemBehaviour> gems)
     {
         var movingGems = new List<GemBehaviour>();
-        
+
         var columns = GetColumns(gems);
         foreach (var column in columns){
             movingGems.AddRange(
@@ -193,11 +205,11 @@ public class BoardBehaviour : MonoBehaviour
 
         return movingGems;
     }
-    
+
     // TODO refactor!
     private List<GemBehaviour> CollapseColumn(int column)
     {
-        var movingGems =  new List<GemBehaviour>();
+        var movingGems = new List<GemBehaviour>();
 
         for (var i = 0; i < Rows - 1; i++){
             if (GetGem(column, i) != null){
@@ -210,11 +222,12 @@ public class BoardBehaviour : MonoBehaviour
                     continue;
                 }
 
-                gem.Move(new GridIndex(column, i), GEM_MOVE_TIME);
-                
-                SetGemPosition(gem, column, i);
+                var index = new GridIndex(column, i);
+                gem.Move(index, GemFallTime * (j - i));
+
+                SetGemPosition(gem, index);
                 movingGems.Add(gem);
-                
+
                 allGems[column, j] = null;
                 break;
             }
@@ -222,7 +235,62 @@ public class BoardBehaviour : MonoBehaviour
 
         return movingGems;
     }
-    
+
+
+    private void ClearAndRefillBoard(IEnumerable<GemBehaviour> gems)
+    {
+        StartCoroutine(ClearAndRefillBoardRoutine(gems));
+    }
+
+
+    private IEnumerator ClearAndRefillBoardRoutine(IEnumerable<GemBehaviour> gems)
+    {
+        playerControlsEnabled = false;
+
+        yield return new WaitForSeconds(PlayerMatchCheckDelay);
+
+        yield return StartCoroutine(ClearAndCollapseRoutine(gems));
+        yield return null;
+
+        yield return StartCoroutine(RefillRoutine());
+
+        playerControlsEnabled = true;
+    }
+
+    private IEnumerator ClearAndCollapseRoutine(IEnumerable<GemBehaviour> matches)
+    {
+        var complete = false;
+        while (!complete){
+            ClearGems(matches);
+
+            yield return new WaitForSeconds(0.25f);
+
+            var movedGems = CollapseColumns(matches);
+
+            while (!IsFallComplete(movedGems)){
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(RefreshMatchCheckDelay);
+
+            matches = FindMatchesAt(movedGems);
+
+            if (!matches.Any()){
+                complete = true;
+                break;
+            }
+
+
+            yield return StartCoroutine(ClearAndCollapseRoutine(matches));
+        }
+    }
+
+    private IEnumerator RefillRoutine()
+    {
+        FillBoard(true);
+        yield return null;
+    }
+
     #endregion
 
 
@@ -230,7 +298,7 @@ public class BoardBehaviour : MonoBehaviour
 
     public void ClickTile(GridTileBehaviour tile)
     {
-        if (clickedTile == null){
+        if (playerControlsEnabled && clickedTile == null){
             clickedTile = tile;
         }
     }
@@ -270,21 +338,22 @@ public class BoardBehaviour : MonoBehaviour
         var indexA = gemA.Index.Clone();
         var indexB = gemB.Index.Clone();
 
-        gemA.Move(indexB, GEM_MOVE_TIME);
-        gemB.Move(indexA, GEM_MOVE_TIME);
+        gemA.Move(indexB, GemMoveTime);
+        gemB.Move(indexA, GemMoveTime);
 
-        yield return new WaitForSeconds(GEM_MOVE_TIME);
+        yield return new WaitForSeconds(GemMoveTime);
 
-        var matches = FindMatchesAt(indexA).Union(FindMatchesAt(indexB));
+        var matches =
+            FindMatchesAt(indexA)
+               .Union(FindMatchesAt(indexB));
+
 
         if (matches.Any()){
-            yield return new WaitForSeconds(MATCH_CHECK_DELAY);
-            ClearGems(matches);
-            CollapseColumns(matches);
-
+            yield return new WaitForSeconds(PlayerMatchCheckDelay);
+            ClearAndRefillBoard(matches);
         } else{
-            gemA.Move(indexA, GEM_MOVE_TIME);
-            gemB.Move(indexB, GEM_MOVE_TIME);
+            gemA.Move(indexA, GemMoveTime);
+            gemB.Move(indexB, GemMoveTime);
         }
     }
 
@@ -293,6 +362,12 @@ public class BoardBehaviour : MonoBehaviour
     {
         return Mathf.Abs(indexA.GridX - indexB.GridX) == 1 && indexA.GridY == indexB.GridY
             || Mathf.Abs(indexA.GridY - indexB.GridY) == 1 && indexA.GridX == indexB.GridX;
+    }
+
+
+    private bool IsFallComplete(IEnumerable<GemBehaviour> gems)
+    {
+        return gems.All(gem => !gem.IsMoving);
     }
 
     #endregion
@@ -306,7 +381,7 @@ public class BoardBehaviour : MonoBehaviour
 
         var startGem = GetGem(startIndex);
         if (startGem == null){
-            throw new NullReferenceException("Start gem can't be null");
+            return Enumerable.Empty<GemBehaviour>();
         }
 
         matches.Add(startGem);
@@ -363,9 +438,21 @@ public class BoardBehaviour : MonoBehaviour
         hMatches = hMatches.Count >= 3 ? hMatches : new List<GemBehaviour>();
         vMatches = vMatches.Count >= 3 ? vMatches : new List<GemBehaviour>();
 
-        return hMatches.Count + vMatches.Count > 0
-                   ? hMatches.Union(vMatches).ToList()
-                   : new List<GemBehaviour>();
+        return hMatches.Any() || vMatches.Any()
+                   ? hMatches.Union(vMatches)
+                   : Enumerable.Empty<GemBehaviour>();
+    }
+
+
+    private IEnumerable<GemBehaviour> FindMatchesAt(IEnumerable<GemBehaviour> gems)
+    {
+        return gems.Aggregate(
+            Enumerable.Empty<GemBehaviour>(),
+            (result, gem) =>
+                result.Union(
+                    FindMatchesAt(gem.Index)
+                )
+        );
     }
 
     #endregion
@@ -373,8 +460,21 @@ public class BoardBehaviour : MonoBehaviour
 
     #region Diagnostics
 
+    private void ClearAllHighlights()
+    {
+        for (var i = 0; i < Columns; i++){
+            for (var j = 0; j < Rows; j++){
+                GetTile(new GridIndex(i, j))
+                   .GetComponent<SpriteRenderer>()
+                   .SetEnabled(false);
+            }
+        }
+    }
+
     private void HighlightMatches()
     {
+        ClearAllHighlights();
+
         for (var i = 0; i < Columns; i++){
             for (var j = 0; j < Rows; j++){
                 HighlightMatchesAt(
@@ -435,9 +535,9 @@ public class BoardBehaviour : MonoBehaviour
         foreach (var gem in gems){
             columns.Add(gem.Index.GridX);
         }
-        
+
         return columns;
     }
-    
+
     #endregion
 }
